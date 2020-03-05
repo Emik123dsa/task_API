@@ -2,6 +2,8 @@
 
 namespace API\Connection;
 
+use API\Config\Config;
+
 trait Singleton 
 {
     /**
@@ -14,7 +16,15 @@ trait Singleton
     /**
      * Private magic methods for singleton
      */
-    private function __construct() {}
+    private function __construct() 
+    {
+        $this->ch = curl_init(); 
+
+        $this->url = Config::item('main', 'baseUrl'); 
+
+        $this->options = Config::group('options');
+    }
+    
     private function __wakeup() {}
     private function __clone() {}
 
@@ -23,13 +33,17 @@ trait Singleton
      *
      * @return void
      */
-    public function getInstance() 
+    public static function getInstance() 
     {
         if (!isset(static::$_instance)) 
         {
             static::$_instance = new self; 
         }
-        
+        /**
+         * It's not required
+         */
+        //tatic::$_instance->connectToApi();
+
         return static::$_instance; 
     }
 

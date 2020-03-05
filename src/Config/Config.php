@@ -28,7 +28,7 @@ class Config
      * @param $group
      * @return void
      */
-    public static function config($group) 
+    public static function group($group) 
     {
         if (!Repository::retrieveByGroup($group)) 
         {
@@ -43,15 +43,15 @@ class Config
      * @param string $data
      * @return void
      */
-    public static function file(string $data = 'config') 
+    public static function file(string $data) 
     {
         $path = __DIR__ . DS . '..' . DS . $data . '.php'; 
-
+        
         if (file_exists($path)) 
         {
-            $features = include_once $path; 
+            $features = include $path; 
 
-            if (is_array($templatePath)) 
+            if (is_array($features)) 
             {
                 foreach ($features as $feature => $value)
                 Repository::store($data, $feature, $value);

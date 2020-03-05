@@ -18,13 +18,14 @@ class Repository
      * @param [type] $key
      * @return void
      */
-    public static function store($data, $group, $key) 
+    public static function store($group, $key, $data) 
     {
-        if(!is_array(static::$stored) || !isset(static::$stored)) 
+        if(!isset(static::$stored) || !is_array(static::$stored)) 
         {
             static::$stored[$group] = [];
+            
         }
-
+        
         static::$stored[$group][$key] = $data;
     }
     /**
