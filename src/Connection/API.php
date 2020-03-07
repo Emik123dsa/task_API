@@ -33,15 +33,14 @@ class API
      * @var [type]
      */
     protected $token;
-
+    protected $list;
     public function getAPITree() 
     {
         $this->ch = curl_init(); 
-
         if (isset($this->url)) {
 
-         $organId = static::GUID();
-
+         $organId = $this->list->{'0'}->id;
+         
          $query = 
          [
              'access_token' => $this->token
@@ -65,27 +64,59 @@ class API
      *
      * @return array
      */
-    private function getAPIToken() 
+    private function getApi($mode) 
     {
-        $chToken = curl_init(); 
-
-        $url = Config::item('main', 'baseUrlToken'); 
-
-        $options = Config::group('auth');
-
-        if (is_array($this->options) || is_string($url)) {
-
-        $this->setOptGET($chToken, $options, $url); 
+        $ch = curl_init(); 
         
-        $data = $this->execute($chToken);
-        
-        $this->close($chToken); 
-        
-        return $this->fetchData($data);
+        if ($mode !== null) {
+        $mode = mb_strtolower($mode); 
 
-    } else {
-        $this->close($chToken);
+        switch ($mode) 
+        {
+            case 'token': 
+                $url = Config::item('main', 'baseUrlToken'); 
+                $options = Config::group('auth');
+                if (is_array($this->options) || is_string($url)) {
+
+                $this->setOptGET($ch, $options, $url); 
+                
+                $data = $this->execute($ch);
+                
+                $this->close($ch); 
+                
+                return $this->fetchData($data);
+            }
+            break;
+
+            case 'list': 
+
+                $url = Config::item('main', 'baseUrlList');
+                $query = 
+                [
+                    'access_token' => $this->token
+                ];
+
+                if (is_string($url)) {
+
+                $this->setOptGET($ch, $query, $url); 
+                
+                $data = $this->execute($ch);
+                
+                $this->close($ch); 
+                
+                return $this->fetchData($data);
+            }
+            break;
+            default: 
+                throw new \InvalidArgumentException(sprintf('This entity does not exist', $mode));
+            break; 
+        }
+
+    } else 
+    {
+        $this->close($ch);
     }
+
     }
     /**
      * Execution for curl
