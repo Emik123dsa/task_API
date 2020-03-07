@@ -22,7 +22,7 @@ trait Singleton
         $this->url = Config::item('main', 'baseUrlTree'); 
 
         $this->token = $this->getApi('token');
-
+        
         if (!empty($this->token)) {
 
         $this->list = $this->getApi('list');

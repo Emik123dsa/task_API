@@ -11,10 +11,15 @@ function path($data, $file = 'entrance')
         case 'entrance': 
             return sprintf($templatePath, ucfirst($file), (string) $php);
         break; 
+
+        case 'template': 
+            return sprintf($templatePath, mb_strtolower($file), (string) $php);
+        break;
         
         default: 
         
     break;
+
     }
 }
 
