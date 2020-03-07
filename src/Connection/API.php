@@ -2,10 +2,12 @@
 
 namespace API\Connection;
 
+use API\Config\Config;
 use stdClass;
 
 class API 
 {
+
     use Singleton; 
     /**
      * Options for api connections
@@ -26,21 +28,82 @@ class API
      */
     protected $ch;
     /**
+     * Token for auth
+     *
+     * @var [type]
+     */
+    protected $token;
+
+    public function getAPITree() 
+    {
+        $this->ch = curl_init(); 
+
+        if (isset($this->url)) {
+
+         $organId = static::GUID();
+
+         $query = 
+         [
+             'access_token' => $this->token
+         ];
+
+         $this->setOptGET($this->ch, $query, $this->url, $organId);
+
+         $data = $this->execute($this->ch);  
+        
+         $this->close($this->ch);
+
+         if (is_array($data) && isset($data)) {
+
+            $dataCamel = static::CamelConvertToStd($data); 
+
+        return $dataCamel;
+
+        } else {
+          
+            return $data;
+
+        }
+    } else 
+    {
+        $this->close($this->ch);
+    }
+    }
+    /**
      * Connect to api via singleton
      *
      * @return array
      */
-    public function getAPI() 
+    private function getAPIToken() 
     {
-        $this->setopt($this->ch, $this->options, $this->url); 
+        $chToken = curl_init(); 
+
+        $url = Config::item('main', 'baseUrlToken'); 
+
+        $options = Config::group('auth');
+
+        if (is_array($this->options) || is_string($url)) {
+
+        $this->setOptGET($chToken, $options, $url); 
         
-        $data = $this->execute();
+        $data = $this->execute($chToken);
         
-        $this->close($this->ch); 
+        $this->close($chToken); 
         
-        $dataCamel = static::CamelConvertToStd($data); 
+        if (is_array($data) && isset($data)) {
+
+            $dataCamel = static::CamelConvertToStd($data); 
 
         return $dataCamel;
+
+        } else {
+          
+            return $data;
+
+        }
+    } else {
+        $this->close($chToken);
+    }
     }
     /**
      * Execution for curl
@@ -48,9 +111,14 @@ class API
      * @param boolean $mode
      * @return array
      */
-    private function execute($mode = true) 
+    private function execute($ch, $mode = true) 
     {
-        $response = curl_exec($this->ch);
+        $response = curl_exec($ch);
+
+        if(!$response = curl_exec($ch)) 
+        {
+            trigger_error(curl_error($ch));
+        }
 
         if ($mode = false) { 
 
@@ -74,13 +142,26 @@ class API
      * @param [type] $modeTransfer
      * @return void
      */
-    private function setopt($ch, $options = [], $url = [], $modeUrl = CURLOPT_URL, $modeTransfer = CURLOPT_RETURNTRANSFER) 
+    private function setOptGET($ch, $options = [], $url = [], $features = '',  $modeHOST = CURLOPT_SSL_VERIFYHOST, $modePeer = CURLOPT_SSL_VERIFYPEER) 
     {
         if(!is_array($options) || !is_array($url)) {
 
-        curl_setopt($ch, $modeTransfer, 1); 
+            $default = [
 
-        curl_setopt($ch, $modeUrl, $url . '?' . http_build_query($options));
+            CURLOPT_URL => $url . $features . '?' . http_build_query($options),
+            CURLOPT_HEADER => 0,
+            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_DNS_USE_GLOBAL_CACHE => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0
+
+            ];
+
+        curl_setopt_array($ch, $default);
+
+        curl_setopt($ch, $modeHOST, 0); 
+
+        curl_setopt($ch, $modePeer, 0);
         
         }
 
@@ -117,6 +198,16 @@ class API
                 $object->$key = $value;
             }
             return $object;
+        }
+    }
+
+    public static function GUID()
+    {
+        $data = (string) getGUID(); 
+        
+        if (isset($data)) 
+        {
+            return str_replace('\r', '', $data); 
         }
     }
     

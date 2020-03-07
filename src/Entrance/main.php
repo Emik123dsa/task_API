@@ -1,6 +1,9 @@
 <?php 
 
+$port = '9900'; 
+
 return array(
-    'baseUrl' => 'https://samples.openweathermap.org/data/2.5/weather'
+    'baseUrlToken' => 'https://iiko.biz:' . $port . '/api/0/auth/access_token', 
+    'baseUrlTree'  => 'https://iiko.biz:' . $port . '/api/0/nomenclature/'
 );
 ?>

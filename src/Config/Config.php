@@ -45,7 +45,7 @@ class Config
      */
     public static function file(string $data) 
     {
-        $path = path() . DS . $data . '.php';
+        $path = path($data);
         
         if (file_exists($path)) 
         {

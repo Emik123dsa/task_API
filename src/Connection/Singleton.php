@@ -18,11 +18,15 @@ trait Singleton
      */
     private function __construct() 
     {
-        $this->ch = curl_init(); 
 
-        $this->url = Config::item('main', 'baseUrl'); 
+        $this->url = Config::item('main', 'baseUrlTree'); 
 
-        $this->options = Config::group('options');
+        if (empty($this->token)) {
+          
+        $this->token = $this->getApiToken();
+        
+    }
+    
     }
     
     private function __wakeup() {}
@@ -42,7 +46,7 @@ trait Singleton
         /**
          * It's not required
          */
-        //tatic::$_instance->connectToApi();
+        //static::$_instance->connectToApi();
 
         return static::$_instance; 
     }

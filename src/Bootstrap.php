@@ -7,7 +7,11 @@
 
     $api = API::getInstance();
 
-    $features = $api->getAPI();
+    $features = $api->getAPITree();
 
-    print_r($features);
+    foreach($features as $feature) 
+    {
+        echo $feature;
+    }
+
 ?>
