@@ -53,17 +53,8 @@ class API
         
          $this->close($this->ch);
 
-         if (is_array($data) && isset($data)) {
+         return $this->fetchData($data);
 
-            $dataCamel = static::CamelConvertToStd($data); 
-
-        return $dataCamel;
-
-        } else {
-          
-            return $data;
-
-        }
     } else 
     {
         $this->close($this->ch);
@@ -90,17 +81,8 @@ class API
         
         $this->close($chToken); 
         
-        if (is_array($data) && isset($data)) {
+        return $this->fetchData($data);
 
-            $dataCamel = static::CamelConvertToStd($data); 
-
-        return $dataCamel;
-
-        } else {
-          
-            return $data;
-
-        }
     } else {
         $this->close($chToken);
     }
@@ -176,6 +158,26 @@ class API
     {
         curl_close($ch);
     }
+    /**
+     * Fetch Total data
+     *
+     * @return void
+     */ 
+    private function fetchData($data) 
+    {
+        if (is_array($data) && isset($data)) {
+
+            $dataCamel = static::CamelConvertToStd($data); 
+
+        return $dataCamel;
+
+        } else {
+          
+            return $data;
+
+        }
+    }
+
     /**
      * Static camel class to std Object convert
      *
